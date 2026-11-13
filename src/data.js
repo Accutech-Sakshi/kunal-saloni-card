@@ -1,5 +1,6 @@
-// Only names, confirmed dates/times and venue come from the provided wedding PDF.
-// Sangeet / Mehndi / Haldi dates and timings were NOT specified; edit when confirmed.
+// Names, wedding venue and Pheras/Reception times come from the invitation.
+// Haldi, Mehendi, Carnival and Cocktail dates were supplied afterward.
+// Unspecified times and venues remain unconfirmed.
 export const invitation = {
   groom: 'Kunal',
   bride: 'Saloni',
@@ -15,10 +16,15 @@ export const invitation = {
   invitedBy: 'Mrs. Poonam & Mr. Sandeep Garg',
   rsvpLabel: 'RSVP – Garg Family',
   phones: ['+91-9882896000', '+91-9418044412'],
+  // Event dates supplied by the family. Times not provided remain TBA.
+  // Carnival/Cocktail reuse available event artwork until their own images are supplied.
+  // Event schedule confirmed by the family. No unconfirmed times are displayed.
+  // Existing Carnival and Cocktail graphics reuse the available illustrated assets.
   events: [
-    { title:'Sangeet', image:'sangeet', background:'bg-sangeet-new', coupleImage:'couple-sangeet', subtitle:'A musical night of song, dance & laughter', date:'To be announced', time:'To be announced', venue:'To be confirmed' },
-    { title:'Mehndi', image:'mehndi', background:'bg-gavdev-groom-new', coupleImage:'couple-gavdev', subtitle:'A colourful celebration of love and traditions', date:'To be announced', time:'To be announced', venue:'To be confirmed' },
-    { title:'Haldi', image:'haldi', background:'bg-haldi-new', coupleImage:'couple-haldi', subtitle:'A joyful beginning filled with blessings', date:'To be announced', time:'To be announced', venue:'To be confirmed' },
-    { title:'Reception', image:'reception', background:'bg-varmala-new', coupleImage:'couple-varmala', subtitle:'An evening to celebrate our new journey', date:'Wednesday, 2 Dec 2026', time:'8:00 PM', venue:'The Palace Banquet Hall' }
+    { title:'Haldi', image:'haldi', background:'bg-haldi-new', coupleImage:'couple-haldi', subtitle:'A joyful beginning filled with blessings', date:'29 November 2026' },
+    { title:'Mehendi', image:'mehndi', background:'bg-gavdev-groom-new', coupleImage:'couple-gavdev', subtitle:'An afternoon of colour, love and tradition', date:'30 November 2026' },
+    { title:'Carnival', image:'carnival', background:'bg-sapthapadi-new', coupleImage:'couple-carnival', subtitle:'Celebrating togetherness, laughter and joy', date:'1 December 2026' },
+    { title:'Cocktail', image:'cocktail', background:'bg-sangeet-new', coupleImage:'couple-sangeet', subtitle:'An evening of music and cherished memories', date:'1 December 2026' },
+    { title:'Wedding', kind:'wedding', image:'pheras', background:'bg-varmala-new', coupleImage:'couple-varmala', subtitle:'Two hearts, one beautiful beginning', date:'Wednesday, 2 December 2026' }
   ]
 };

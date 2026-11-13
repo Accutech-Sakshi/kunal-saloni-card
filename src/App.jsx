@@ -3,12 +3,15 @@ import { invitation } from './data.js';
 
 const asset = (name) => `/assets/${name}`;
 
-const petals = Array.from({length: 15}, (_, i) => ({
+// Decorative particles are generated only while scratching; no React rerenders per stroke.
+const scratchSymbols = ['🌸', '✿', '❀', '🌼', '✨', '❁'];
+
+const petals = Array.from({length: 21}, (_, i) => ({
   id: i,
   left: `${(i * 37.31 + 8) % 100}%`,
-  delay: `${-((i * 3.83) % 27).toFixed(2)}s`,
-  duration: `${(21 + (i % 7) * 2.0).toFixed(2)}s`,
-  size: `${13 + (i % 5) * 3}px`,
+  delay: `${-((i * 2.17) % 15).toFixed(2)}s`,
+  duration: `${(11.5 + (i % 8) * 0.75).toFixed(2)}s`,
+  size: `${15 + (i % 5) * 2}px`,
   drift: `${(i % 2 ? 1 : -1) * (25 + (i % 5) * 19)}px`,
   symbol: ['🌸','🌸','🌺','🌸','🌼','🍃'][i % 6],
 }));
@@ -87,12 +90,38 @@ function ScratchReveal({ onReveal }) {
   const [revealed, setRevealed] = useState(false);
   const [progress, setProgress] = useState(0);
   const revealOnceRef = useRef(false);
+  const particlesRef = useRef(null);
+  const lastParticleRef = useRef(0);
+
+  function addParticle(clientX, clientY, burst = false) {
+    const layer = particlesRef.current;
+    if (!layer) return;
+    const rect = layer.getBoundingClientRect();
+    const count = burst ? 22 : 2;
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('span');
+      el.className = 'scratch-spark';
+      el.textContent = scratchSymbols[Math.floor(Math.random() * scratchSymbols.length)];
+      el.style.left = `${clientX - rect.left}px`;
+      el.style.top = `${clientY - rect.top}px`;
+      const angle = Math.random() * Math.PI * 2;
+      const travel = burst ? 35 + Math.random() * 110 : 16 + Math.random() * 44;
+      el.style.setProperty('--spark-x', `${Math.cos(angle) * travel}px`);
+      el.style.setProperty('--spark-y', `${Math.sin(angle) * travel - (burst ? 20 : 9)}px`);
+      el.style.setProperty('--spark-r', `${Math.round(Math.random() * 210 - 105)}deg`);
+      el.style.setProperty('--spark-size', `${burst ? 13 + Math.random() * 15 : 10 + Math.random() * 9}px`);
+      layer.appendChild(el);
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+    }
+  }
 
   const completeReveal = () => {
     if (revealOnceRef.current) return;
     revealOnceRef.current = true;
+    const r = particlesRef.current?.getBoundingClientRect();
+    if (r) addParticle(r.left + r.width / 2, r.top + r.height / 2, true);
     setRevealed(true);
-    onReveal?.();
+    window.setTimeout(() => onReveal?.(), 520);
   };
 
   // Draw once per size change. Do NOT repaint the cover on every pointer move.
@@ -163,6 +192,12 @@ function ScratchReveal({ onReveal }) {
     ctx.restore();
     lastPointRef.current = point;
     erasedRef.current = true;
+    // Soft floral particles following a finger/mouse stroke, throttled for mobile.
+    const now = performance.now();
+    if (now - lastParticleRef.current > 85) {
+      lastParticleRef.current = now;
+      addParticle(event.clientX, event.clientY);
+    }
   };
 
   const checkProgress = () => {
@@ -186,6 +221,7 @@ function ScratchReveal({ onReveal }) {
         <strong>Kunal <em>&amp;</em> Saloni</strong>
         <small>WEDNESDAY · 2 DECEMBER 2026</small>
       </div>
+      <div className="scratch-particle-layer" ref={particlesRef} aria-hidden="true" />
       <canvas
         ref={canvasRef}
         className="scratch-canvas"
@@ -204,6 +240,8 @@ function ScratchReveal({ onReveal }) {
         onPointerCancel={()=>{drawingRef.current=false;lastPointRef.current=null;checkProgress();}}
       />
     </div>
+    {!revealed && <p className="scratch-help">Swipe your finger over the gold card <span aria-hidden="true">✧</span> {progress>0?`${progress}% revealed`:''}</p>}
+    {!revealed && <button className="scratch-reveal-button" type="button" onClick={completeReveal}>Tap to reveal</button>}
     {revealed && <p className="scratch-revealed-note" role="status">✦ A celebration of forever ✦</p>}
   </section>;
 }
@@ -237,18 +275,27 @@ function EventArtwork({ name, fallback, className, alt }) {
 }
 
 function EventCard({event}) {
-  return <article className="event-card event-card-illustrated reveal">
+  const isWedding = event.kind === 'wedding';
+  return <article className={`event-card event-card-illustrated reveal ${isWedding ? 'event-wedding' : 'event-date-only'}`}>
     <EventArtwork name={event.background} fallback={event.image} className="event-art-bg" alt="" />
     <div className="event-art-overlay" />
-    <EventArtwork name={event.coupleImage} className="event-art-couple" alt={`${event.title} wedding couple illustration`} />
+    <EventArtwork name={event.coupleImage} className="event-art-couple" alt={`${event.title} illustration`} />
     <div className="event-copy">
       <h3>{event.title}</h3>
       <p className="event-subtitle">{event.subtitle}</p>
-      <dl>
-        <dt>DATE</dt><dd>{event.date}</dd>
-        <dt>TIME</dt><dd>{event.time}</dd>
-        <dt>VENUE</dt><dd>{event.venue}</dd>
-      </dl>
+      {isWedding ? <>
+        <p className="event-date-feature">{event.date}</p>
+        <p className="wedding-ceremony-title">Auspicious Wedding Ceremony</p>
+        <div className="wedding-ceremony-times">
+          <div><span className="ceremony-icon" aria-hidden="true">♨</span><strong>Pheras</strong><span>4:00 PM</span></div>
+          <div><span className="ceremony-icon" aria-hidden="true">🥂</span><strong>Reception</strong><span>8:00 PM</span></div>
+        </div>
+        <p className="wedding-venue-label">Venue</p>
+        <p className="wedding-venue-name">{invitation.venueName}</p>
+        <p className="wedding-venue-address">{invitation.venueAddress}</p>
+      </> : <>
+        <p className="event-date-feature">{event.date}</p>
+      </>}
     </div>
   </article>;
 }
