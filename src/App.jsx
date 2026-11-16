@@ -265,7 +265,7 @@ function SaveDate() {
       ))}
     </div>}
     {unlocked && <div className="date-unlocked" role="status" aria-live="polite">
-      <div className="date-ornate"><span>SAVE THE DATE</span><strong>2ND DECEMBER 2026</strong></div>
+      <div className="date-ornate"><span>SAVE THE DATE</span><strong>2nd DECEMBER 2026</strong></div>
       <div className="countdown-boxes">{values.map((v,i)=><div className="counter" key={i}><strong>{String(v).padStart(2,'0')}</strong><span>{['DAYS','HOURS','MINUTES','SECONDS'][i]}</span></div>)}</div>
     </div>}
   </section>;

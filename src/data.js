@@ -2,7 +2,7 @@
 export const wedding={
   groom:'Kunal', bride:'Saloni',
   groomParents:'Mrs. Monika & Mr. Pardeep Garg',
-  brideParents:'Mrs. Sushila & Mr. Munish Singla',
+  brideParents:'Mrs. Sushila & Mr. Manish Singla',
   dateISO:'2026-12-02T16:00:00+05:30', date:'2 December 2026',
   venue:'The Palace Banquet Hall',address:'Rangarh Derabassi Road, Kakrali, Punjab',
   mapQuery:'The Palace Banquet Hall Rangarh Derabassi Road Kakrali Punjab',
