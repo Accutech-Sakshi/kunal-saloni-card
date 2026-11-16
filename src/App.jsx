@@ -52,7 +52,6 @@ function RoyalHero() {
         <div className="royal-prayer">|| OM SHREE GANESHAYA NAMAH ||</div>
         <div className="royal-mantra">
           <p>मङ्गलं भगवान् विष्णुः मङ्गलं गरुडध्वजः ।<br />मङ्गलं पुण्डरीकाक्षः मङ्गलाय तनो हरिः ॥</p>
-          <small>MANGALAM BHAGWAN VISHNU · MANGALAM GARUDADHWAJAH<br />MANGALAM PUNDARIKAKSHAH · MANGALAYA TANO HARIH</small>
         </div>
         <p className="wedding-invite-text">We request the honour of your gracious presence on the auspicious<br className="desktop-only" /> occasion of the wedding celebration of</p>
         <h2 className="royal-name">{wedding.groom}</h2>
