@@ -1,408 +1,301 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { invitation } from './data.js';
+import { wedding } from './data.js';
 
-const asset = (name) => `/assets/${name}`;
-
-// Decorative particles are generated only while scratching; no React rerenders per stroke.
-const scratchSymbols = ['🌸', '✿', '❀', '🌼', '✨', '❁'];
-
-const petals = Array.from({length: 21}, (_, i) => ({
-  id: i,
-  left: `${(i * 37.31 + 8) % 100}%`,
-  delay: `${-((i * 2.17) % 15).toFixed(2)}s`,
-  duration: `${(11.5 + (i % 8) * 0.75).toFixed(2)}s`,
-  size: `${15 + (i % 5) * 2}px`,
-  drift: `${(i % 2 ? 1 : -1) * (25 + (i % 5) * 19)}px`,
-  symbol: ['🌸','🌸','🌺','🌸','🌼','🍃'][i % 6],
+const A = name => `/assets/${name}`;
+const flowerData = Array.from({ length: 9 }, (_, i) => ({
+  left: `${(i * 41.37 + 9) % 100}%`,
+  delay: `${-((i * 2.07) % 33)}s`,
+  duration: `${30 + ((i * 7) % 11)}s`,
+  drift: `${((i % 2) ? -1 : 1) * (24 + ((i * 11) % 75))}px`,
+  size: `${11 + (i % 5) * 2}px`,
+  rose: i % 4 !== 0,
 }));
 
-function FlowerShower({burst=false}) {
-  return <div className={`petal-rain ${burst ? 'petal-rain-burst' : ''}`} aria-hidden="true">
-    {petals.map(p=><span key={p.id} className="rain-petal" style={{
-      '--left':p.left, '--delay':p.delay, '--duration':p.duration,
-      '--size':p.size, '--drift':p.drift
-    }}>{p.symbol}</span>)}
+function Petals() {
+  return <div className="falling-petals" aria-hidden="true">
+    {flowerData.map((f, i) => <img key={i} src={A(f.rose ? 'rose-petal.svg' : 'pink-flower.svg')}
+      style={{ '--x': f.left, '--delay': f.delay, '--duration': f.duration, '--drift': f.drift, '--sz': f.size }} alt="" />)}
   </div>;
 }
-
-function FloatingFlowers(){
-  return <FlowerShower />;
+function Bells() {
+  return <div className="bell-pair" aria-hidden="true">
+    {['left a','left b','right a','right b'].map((pos, i) => <div className={`hanging-bell ${pos.replace(' ', '-')}`} key={pos} style={{'--phase': `${-i * .72}s`}}>
+      <span className="bell-line"/><svg viewBox="0 0 50 56" width="48" height="54"><path fill="#aa671d" d="M25 7c-9 0-15 8-15 17v10L4 40h42l-6-6V24c0-9-6-17-15-17Z"/><path fill="#d99a40" d="M11 31h28l4 8H7Z"/><path fill="#bb7b26" d="M21 7c0-7 8-7 8 0"/><circle cx="25" cy="44" r="5" fill="#a76721"/><path d="M15 16c0-4 6-8 10-8" fill="none" stroke="#efc475" strokeWidth="2"/></svg>
+    </div>)}
+  </div>;
 }
-
-function Envelope({onOpen,isOpening}){
-  return <section className={`landing landing-premium ${isOpening ? 'opening' : ''}`} aria-label="Wedding invitation envelope">
-    <FlowerShower burst={isOpening}/>
-    <span className="landing-decor decor-left">🌸</span>
-    <span className="landing-decor decor-right">🌼</span>
-    <button className="envelope envelope-photo" type="button" onClick={onOpen} disabled={isOpening} aria-label="Open Kunal and Saloni wedding invitation">
-      <img className="envelope-reference" src={asset('reference-envelope.png')} alt="Intricate sage green floral wedding envelope" draggable="false" />
-      <span className="envelope-seal photo-seal"><span>K <small>&amp;</small> S</span></span>
-    </button>
-    <div className="landing-copy">
-      <div className="landing-invited">You're Invited</div>
-      <p className="landing-caption">Tap the envelope to open your invitation</p>
+function Opening({ onOpen }) {
+  const [leaving, setLeaving] = useState(false);
+  const open = () => { if (leaving) return; setLeaving(true); window.setTimeout(onOpen, 780); };
+  return <section className={`opening-screen ${leaving ? 'leaving' : ''}`} aria-label="Open invitation">
+    <div className="opening-paper">
+      <img className="opening-ganesh" src={A('ganesh.png')} alt="Lord Ganesh" />
+      <button className="opening-envelope" onClick={open} type="button" aria-label="Open Kunal and Saloni's wedding invitation">
+        <img src={A('envelope.png')} alt="Royal maroon floral envelope" />
+        <span className="wax-seal">K<span>&amp;</span>S</span>
+      </button>
+      <h1>YOU’RE INVITED</h1>
+      <p>Tap the envelope to open our invitation</p>
     </div>
   </section>;
 }
-
-
-const WEDDING_DATE = new Date(invitation.weddingDateISO);
-
-function getRemaining() {
-  const delta = Math.max(0, WEDDING_DATE.getTime() - Date.now());
-  return {
-    days: Math.floor(delta / 86400000),
-    hours: Math.floor(delta / 3600000) % 24,
-    minutes: Math.floor(delta / 60000) % 60,
-    seconds: Math.floor(delta / 1000) % 60,
-  };
+function SectionHeader({ title, eyebrow }) {
+  return <div className="section-heading reveal"><span>{eyebrow || '✦ WITH LOVE ✦'}</span><h2>{title}</h2><div className="tiny-flourish">❀</div></div>;
 }
-
-function Countdown() {
-  const [remaining, setRemaining] = useState(getRemaining);
-  useEffect(() => {
-    const interval = window.setInterval(() => setRemaining(getRemaining()), 1000);
-    return () => window.clearInterval(interval);
-  }, []);
-  return <section className="countdown-section" aria-labelledby="countdown-title">
-    <div className="countdown-paper">
-      <span className="countdown-decoration" aria-hidden="true">✿</span>
-      <p className="countdown-eyebrow">SAVE THE DATE</p>
-      <h2 id="countdown-title">2nd December 2026</h2>
-    </div>
-    <div className="countdown-units" role="timer" aria-label="Time remaining until 2 December 2026">
-      {Object.entries(remaining).map(([key, value]) =>
-        <div className="countdown-unit" key={key}>
-          <span className="countdown-value">{String(value).padStart(2, '0')}</span>
-          <span className="countdown-label">{key.toUpperCase()}</span>
+function RoyalHero() {
+  return <section className="royal-hero" id="home" aria-label="Kunal and Saloni wedding invitation">
+    <div className="royal-art">
+      <img className="royal-art-bg" src={A('hero-bg.jpg')} alt="" />
+      <Bells />
+      <div className="royal-content">
+        <img className="royal-ganesh" src={A('ganesh.png')} alt="Lord Ganesh" />
+        <div className="royal-prayer">|| OM SHREE GANESHAYA NAMAH ||</div>
+        <div className="royal-mantra">
+          <p>मङ्गलं भगवान् विष्णुः मङ्गलं गरुडध्वजः ।<br />मङ्गलं पुण्डरीकाक्षः मङ्गलाय तनो हरिः ॥</p>
+          <small>MANGALAM BHAGWAN VISHNU · MANGALAM GARUDADHWAJAH<br />MANGALAM PUNDARIKAKSHAH · MANGALAYA TANO HARIH</small>
         </div>
-      )}
+        <p className="royal-intro">We request the honour of your gracious presence on the auspicious<br className="desktop-only" /> occasion of the wedding celebration of</p>
+        <h2 className="royal-name">{wedding.groom}</h2>
+        <p className="royal-parent">S/o {wedding.groomParents}</p>
+        <p className="royal-weds">weds</p>
+        <h2 className="royal-name bride">{wedding.bride}</h2>
+        <p className="royal-parent">D/o {wedding.brideParents}</p>
+      </div>
+      <img className="shiva-art" src={A('shiva-parvati.png')} alt="Shiva and Parvati wedding blessing illustration" />
     </div>
-    <p className="countdown-message">We can't wait to celebrate with you!</p>
   </section>;
 }
-
-function ScratchReveal({ onReveal }) {
+function useCountdown() {
+  const calc = () => {
+    let t = Math.max(0, new Date(wedding.dateISO).getTime() - Date.now());
+    return [Math.floor(t / 86400000), Math.floor(t / 3600000) % 24, Math.floor(t / 60000) % 60, Math.floor(t / 1000) % 60];
+  };
+  const [values, setValues] = useState(calc);
+  useEffect(() => { const timer = setInterval(() => setValues(calc()), 1000); return () => clearInterval(timer); }, []);
+  return values;
+}
+function Scratch({ onReveal }) {
   const canvasRef = useRef(null);
-  const drawingRef = useRef(false);
-  const lastPointRef = useRef(null);
-  const erasedRef = useRef(false);
-  const [revealed, setRevealed] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const revealOnceRef = useRef(false);
   const particlesRef = useRef(null);
-  const lastParticleRef = useRef(0);
+  const active = useRef(false);
+  const previous = useRef(null);
+  const completed = useRef(false);
+  const hasScratched = useRef(false);
+  const lastPetal = useRef(0);
+  const strokes = useRef(0);
+  const pending = useRef([]);
+  const [revealed, setRevealed] = useState(false);
 
-  function addParticle(clientX, clientY, burst = false) {
+  useEffect(() => () => pending.current.forEach(clearTimeout), []);
+
+  const emit = (x, y, burst = false) => {
     const layer = particlesRef.current;
     if (!layer) return;
-    const rect = layer.getBoundingClientRect();
-    const count = burst ? 22 : 2;
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('span');
-      el.className = 'scratch-spark';
-      el.textContent = scratchSymbols[Math.floor(Math.random() * scratchSymbols.length)];
-      el.style.left = `${clientX - rect.left}px`;
-      el.style.top = `${clientY - rect.top}px`;
-      const angle = Math.random() * Math.PI * 2;
-      const travel = burst ? 35 + Math.random() * 110 : 16 + Math.random() * 44;
-      el.style.setProperty('--spark-x', `${Math.cos(angle) * travel}px`);
-      el.style.setProperty('--spark-y', `${Math.sin(angle) * travel - (burst ? 20 : 9)}px`);
-      el.style.setProperty('--spark-r', `${Math.round(Math.random() * 210 - 105)}deg`);
-      el.style.setProperty('--spark-size', `${burst ? 13 + Math.random() * 15 : 10 + Math.random() * 9}px`);
-      layer.appendChild(el);
-      el.addEventListener('animationend', () => el.remove(), { once: true });
-    }
-  }
-
-  const completeReveal = () => {
-    if (revealOnceRef.current) return;
-    revealOnceRef.current = true;
-    const r = particlesRef.current?.getBoundingClientRect();
-    if (r) addParticle(r.left + r.width / 2, r.top + r.height / 2, true);
-    setRevealed(true);
-    window.setTimeout(() => onReveal?.(), 520);
+    const el = document.createElement('img');
+    el.src = A(burst && Math.random() > .6 ? 'pink-flower.svg' : 'rose-petal.svg');
+    el.alt = '';
+    el.className = burst ? 'scratch-burst-petal' : 'scratch-drag-petal';
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    const radians = burst ? (-Math.PI + Math.random() * Math.PI) : Math.random() * Math.PI * 2;
+    const distance = burst ? 45 + Math.random() * 65 : 10 + Math.random() * 16;
+    el.style.setProperty('--px', `${Math.cos(radians) * distance}px`);
+    el.style.setProperty('--py', `${Math.sin(radians) * distance - (burst ? 22 : 5)}px`);
+    el.style.setProperty('--rot', `${Math.random() * 180 - 90}deg`);
+    layer.appendChild(el);
+    el.addEventListener('animationend', () => el.remove(), { once: true });
   };
 
-  // Draw once per size change. Do NOT repaint the cover on every pointer move.
+  const finish = () => {
+    if (completed.current) return;
+    completed.current = true;
+    active.current = false;
+    setRevealed(true);
+    // Flower fountain is now rendered by SaveDate, OUTSIDE the scratch card.
+    // This keeps the petals visible even after the countdown replaces the card.
+    onReveal?.();
+  };
+
   useEffect(() => {
-    if (revealed) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    function paintCover() {
-      const bounds = canvas.getBoundingClientRect();
-      if (!bounds.width || !bounds.height) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = Math.round(bounds.width * dpr);
-      const height = Math.round(bounds.height * dpr);
-      if (canvas.width === width && canvas.height === height && erasedRef.current) return;
-      canvas.width = width;
-      canvas.height = height;
+    const paint = () => {
+      if (hasScratched.current || completed.current) return;
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(rect.height * ratio);
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const gradient = ctx.createLinearGradient(0, 0, bounds.width, bounds.height);
-      gradient.addColorStop(0, '#d6a46d');
-      gradient.addColorStop(.46, '#f0c98e');
-      gradient.addColorStop(1, '#bb8745');
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
+      gradient.addColorStop(0, '#68111f');
+      gradient.addColorStop(.5, '#a5283c');
+      gradient.addColorStop(1, '#66101f');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, bounds.width, bounds.height);
-      ctx.strokeStyle = '#f5dfb6';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(2, 2, bounds.width-4, bounds.height-4);
-      ctx.fillStyle = '#fff7e6';
-      ctx.textBaseline = 'middle';
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      ctx.strokeStyle = 'rgba(242,199,147,.72)';
+      ctx.lineWidth = 1.6;
+      ctx.strokeRect(2, 2, rect.width - 4, rect.height - 4);
+      ctx.fillStyle = '#fff4e5';
       ctx.textAlign = 'center';
-      ctx.font = `500 ${Math.max(13,Math.min(19,bounds.width / 23))}px Georgia,serif`;
-      ctx.fillText('✦  SCRATCH TO REVEAL  ✦',bounds.width/2,bounds.height/2);
-      erasedRef.current = false;
-    }
-    paintCover();
-    const observer = new ResizeObserver(paintCover);
+      ctx.textBaseline = 'middle';
+      ctx.font = `600 ${Math.min(17, Math.max(12, rect.width / 28))}px Georgia,serif`;
+      ctx.fillText('✦  SCRATCH TO REVEAL  ✦', rect.width / 2, rect.height / 2);
+    };
+    paint();
+    const observer = new ResizeObserver(paint);
     observer.observe(canvas);
     return () => observer.disconnect();
-  }, [revealed]);
+  }, []);
 
-  const position = (event) => {
+  const progress = () => {
     const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: (event.clientX - rect.left) * canvas.width / rect.width,
-      y: (event.clientY - rect.top) * canvas.height / rect.height,
-    };
+    if (!canvas || completed.current) return;
+    const pixels = canvas.getContext('2d', {willReadFrequently:true})
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    let cleared = 0, inspected = 0;
+    for (let n = 3; n < pixels.length; n += 80) {
+      inspected++;
+      if (pixels[n] < 90) cleared++;
+    }
+    if (strokes.current >= 3 && cleared / inspected >= .3) finish();
   };
 
-  const erase = (event) => {
-    if (!drawingRef.current || revealed) return;
+  const erase = event => {
+    if (!active.current || completed.current) return;
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const prev = previous.current || {x,y};
     const ctx = canvas.getContext('2d', {willReadFrequently:true});
-    const point = position(event);
-    const last = lastPointRef.current || point;
+    const ratio = canvas.width / rect.width;
     ctx.save();
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     ctx.globalCompositeOperation = 'destination-out';
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = Math.max(30, Math.min(58,canvas.width * .115));
+    ctx.lineWidth = Math.max(25, Math.min(44, rect.width * .085));
     ctx.beginPath();
-    ctx.moveTo(last.x,last.y);
-    ctx.lineTo(point.x,point.y);
+    ctx.moveTo(prev.x, prev.y);
+    ctx.lineTo(x, y);
     ctx.stroke();
-    // A round endpoint allows a tap or slow initial touch to reveal material too.
-    ctx.beginPath();ctx.arc(point.x,point.y,ctx.lineWidth/2,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, ctx.lineWidth / 2, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
-    lastPointRef.current = point;
-    erasedRef.current = true;
-    // Soft floral particles following a finger/mouse stroke, throttled for mobile.
-    const now = performance.now();
-    if (now - lastParticleRef.current > 85) {
-      lastParticleRef.current = now;
-      addParticle(event.clientX, event.clientY);
+    previous.current = {x,y};
+    hasScratched.current = true;
+    strokes.current++;
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+        performance.now() - lastPetal.current > 550) {
+      emit(x, y);
+      lastPetal.current = performance.now();
     }
+    if (strokes.current % 12 === 0) progress();
   };
 
-  const checkProgress = () => {
-    const canvas=canvasRef.current;
-    if(!canvas || !erasedRef.current || revealed)return;
-    const ctx=canvas.getContext('2d',{willReadFrequently:true});
-    const {data}=ctx.getImageData(0,0,canvas.width,canvas.height);
-    let transparent=0, sampleCount=0;
-    // Subsample pixels for fast completion checks on mobile devices.
-    for(let i=3;i<data.length;i+=64){sampleCount++;if(data[i]<80)transparent++;}
-    const percent=transparent/sampleCount;
-    setProgress(Math.round(percent*100));
-    if(percent>=.36)completeReveal();
+  const stop = e => {
+    if (!active.current) return;
+    erase(e);
+    active.current = false;
+    previous.current = null;
+    progress();
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
-  return <section className="scratch-section" aria-label="Scratch to reveal wedding surprise">
-    <span className="scratch-flower" aria-hidden="true">✿</span>
-    <div className={`scratch-frame ${revealed?'is-revealed':''}`}>
-      <div className="scratch-hidden">
-        <span>WE'RE GETTING MARRIED</span>
-        <strong>Kunal <em>&amp;</em> Saloni</strong>
-        <small>WEDNESDAY · 2 DECEMBER 2026</small>
-      </div>
-      <div className="scratch-particle-layer" ref={particlesRef} aria-hidden="true" />
-      <canvas
-        ref={canvasRef}
-        className="scratch-canvas"
-        aria-label="Drag your finger or mouse over this gold card to reveal the surprise"
-        style={{opacity:revealed?0:1,pointerEvents:revealed?'none':'auto'}}
-        onPointerDown={e=>{
-          drawingRef.current=true;lastPointRef.current=null;
-          e.currentTarget.setPointerCapture(e.pointerId);
-          erase(e);
-        }}
-        onPointerMove={erase}
-        onPointerUp={e=>{
-          if(drawingRef.current){erase(e);drawingRef.current=false;lastPointRef.current=null;checkProgress();}
-          if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);
-        }}
-        onPointerCancel={()=>{drawingRef.current=false;lastPointRef.current=null;checkProgress();}}
-      />
+  return <div className={`scratch-card scratch-v2 ${revealed ? 'is-revealed' : ''}`}>
+    <div className="scratch-under">
+      <span>WE'RE GETTING MARRIED</span>
+      <strong>2 December 2026</strong>
     </div>
-    {!revealed && <p className="scratch-help">Swipe your finger over the gold card <span aria-hidden="true">✧</span> {progress>0?`${progress}% revealed`:''}</p>}
-    {!revealed && <button className="scratch-reveal-button" type="button" onClick={completeReveal}>Tap to reveal</button>}
-    {revealed && <p className="scratch-revealed-note" role="status">✦ A celebration of forever ✦</p>}
+    <canvas
+      ref={canvasRef}
+      onPointerDown={e => {
+        if (completed.current) return;
+        active.current = true;
+        previous.current = null;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        erase(e);
+      }}
+      onPointerMove={erase}
+      onPointerUp={stop}
+      onPointerCancel={stop}
+      aria-label="Scratch the burgundy card to reveal the wedding date"
+    />
+    <div className="scratch-particles scratch-particles-v2" ref={particlesRef} aria-hidden="true" />
+    {!revealed && <button className="scratch-skip" onClick={finish} type="button">Tap to reveal</button>}
+  </div>;
+}
+const revealPetals = [
+  {x:-104,y:-128,rot:-110,delay:0,scale:.85},
+  {x:-66,y:-166,rot:-65,delay:65,scale:1},
+  {x:-30,y:-112,rot:-45,delay:110,scale:.7},
+  {x:18,y:-186,rot:25,delay:45,scale:1},
+  {x:63,y:-149,rot:90,delay:130,scale:.9},
+  {x:106,y:-113,rot:135,delay:80,scale:.8},
+  {x:-83,y:-62,rot:-150,delay:180,scale:.7},
+  {x:84,y:-62,rot:160,delay:200,scale:.75},
+  {x:4,y:-87,rot:200,delay:235,scale:.65},
+];
+
+function SaveDate() {
+  const [unlocked, setUnlocked] = useState(false);
+
+  const values = useCountdown();
+  const reveal = () => setUnlocked(true);
+  return <section className="save-date save-date-floral" id="date">
+    <SectionHeader title="Save The Date" eyebrow="✧" />
+    {!unlocked && <div className="scratch-area">
+      <Scratch onReveal={reveal} />
+      <p className="scratch-help">Swipe gently across the card to reveal the date ✧</p>
+    </div>}
+    {unlocked && <div className="scratch-fountain-overlay" aria-hidden="true">
+      {revealPetals.map((petal, i) => (
+        <img key={i}
+          src={A(i % 3 === 0 ? 'pink-flower.svg' : 'rose-petal.svg')}
+          alt=""
+          style={{
+            '--fx': `${petal.x}px`, '--fy': `${petal.y}px`,
+            '--fr': `${petal.rot}deg`, '--fd': `${petal.delay}ms`,
+            '--fs': petal.scale,
+          }}
+        />
+      ))}
+    </div>}
+    {unlocked && <div className="date-unlocked" role="status" aria-live="polite">
+      <div className="date-ornate"><span>SAVE THE DATE</span><strong>2ND DECEMBER 2026</strong></div>
+      <div className="countdown-boxes">{values.map((v,i)=><div className="counter" key={i}><strong>{String(v).padStart(2,'0')}</strong><span>{['DAYS','HOURS','MINUTES','SECONDS'][i]}</span></div>)}</div>
+    </div>}
   </section>;
 }
-
-function AudioToggle({audioRef,enabled,onToggle}){
-  return <button className="audio-toggle" type="button" onClick={onToggle} aria-label={enabled?'Mute background music':'Play background music'} title={enabled?'Mute music':'Play music'}>
-    {enabled ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14"/></svg> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 5 6m0-6-5 6"/></svg>}
-  </button>;
-}
-
-function Heading({eyebrow,children}){return <><div className="eyebrow">{eyebrow || '✧'}</div><h2 className="section-heading">{children}</h2><div className="heading-ornament">✧</div></>}
-
-// Matches image base names from public/assets. Supports common extensions.
-const imageExtensions = ['png', 'webp', 'jpg', 'jpeg', 'svg'];
-function EventArtwork({ name, fallback, className, alt }) {
-  const candidates = [
-    ...(name ? imageExtensions.map(ext => asset(`${name}.${ext}`)) : []),
-    ...(fallback ? [asset(`${fallback}.svg`)] : []),
-  ];
-  const [index, setIndex] = useState(0);
-  useEffect(() => setIndex(0), [name, fallback]);
-  if (index >= candidates.length) return null;
-  return <img
-    src={candidates[index]}
-    className={className}
-    alt={alt}
-    loading="lazy"
-    draggable="false"
-    onError={() => setIndex(i => i + 1)}
-  />;
-}
-
-function EventCard({event}) {
-  const isWedding = event.kind === 'wedding';
-  return <article className={`event-card event-card-illustrated reveal ${isWedding ? 'event-wedding' : 'event-date-only'}`}>
-    <EventArtwork name={event.background} fallback={event.image} className="event-art-bg" alt="" />
-    <div className="event-art-overlay" />
-    <EventArtwork name={event.coupleImage} className="event-art-couple" alt={`${event.title} illustration`} />
-    <div className="event-copy">
-      <h3>{event.title}</h3>
-      <p className="event-subtitle">{event.subtitle}</p>
-      {isWedding ? <>
-        <p className="event-date-feature">{event.date}</p>
-        <p className="wedding-ceremony-title">Auspicious Wedding Ceremony</p>
-        <div className="wedding-ceremony-times">
-          <div><span className="ceremony-icon" aria-hidden="true">♨</span><strong>Pheras</strong><span>4:00 PM</span></div>
-          <div><span className="ceremony-icon" aria-hidden="true">🥂</span><strong>Reception</strong><span>8:00 PM</span></div>
-        </div>
-        <p className="wedding-venue-label">Venue</p>
-        <p className="wedding-venue-name">{invitation.venueName}</p>
-        <p className="wedding-venue-address">{invitation.venueAddress}</p>
-      </> : <>
-        <p className="event-date-feature">{event.date}</p>
-      </>}
+function EventCard({ e }) {
+  const isWedding = e.id === 'wedding';
+  return <article className={`event-poster theme-${e.tint} event-${e.id} reveal`}>
+    <img className="poster-background" src={A(e.bg)} alt="" loading="lazy" />
+    <div className="event-glass">
+      <img className="event-symbol" src={A(e.icon)} alt="" loading="lazy" />
+      <span className="event-pretitle">PLEASE JOIN US TO CELEBRATE</span>
+      <p className="event-quote">{e.blurb}</p>
+      <h3>{e.title}</h3>
+      <div className="event-date">{e.date.toUpperCase()}</div>
+      {isWedding && <><div className="wedding-times"><div><span>♨</span><strong>Pheras</strong><b>{e.pheras}</b></div><div><span>♧</span><strong>Reception</strong><b>{e.reception}</b></div></div><p className="wedding-place">{wedding.venue}<small>{wedding.address}</small></p></>}
     </div>
+    {!isWedding && <img className="event-illustration" src={A(e.couple)} alt={`${e.title} illustration`} loading="lazy"/>}
+    {isWedding && <img className="event-illustration wedding-illustration" src={A(e.couple)} alt="Kunal and Saloni wedding illustration" loading="lazy"/>}
   </article>;
 }
-
-export default function App(){
-  const [opened,setOpened]=useState(false);
-  const [opening,setOpening]=useState(false);
-  const [soundOn,setSoundOn]=useState(false);
-  const [countdownUnlocked,setCountdownUnlocked]=useState(false);
-  const countdownRef=useRef(null);
-  const audioRef=useRef(null);
-  const timeoutRef=useRef(null);
-  const mainRef=useRef(null);
-
-  useEffect(()=>{
-    if(!opened) return;
-    const observer = new IntersectionObserver(entries=>entries.forEach(entry=>{
-      if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}
-    }),{threshold:.08});
-    document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-    return ()=>observer.disconnect();
-  },[opened]);
-  useEffect(()=>()=>clearTimeout(timeoutRef.current),[]);
-
-  async function playAudio(){
-    const audio=audioRef.current;
-    if(!audio)return;
-    audio.volume=.24;
-    try{await audio.play();setSoundOn(true)}catch{setSoundOn(false)}
-  }
-  function openInvitation(){
-    if(opening||opened)return;
-    setOpening(true);
-    // Audio is started in the explicit user click, per browser autoplay restrictions.
-    playAudio();
-    timeoutRef.current=setTimeout(()=>{setOpened(true);window.scrollTo(0,0)},1100);
-  }
-  function revealCountdown(){
-    setCountdownUnlocked(true);
-    // The countdown appears only after the guest scratches (or taps to reveal).
-    // Wait for React to paint before scrolling to the newly revealed timer.
-    window.setTimeout(() => {
-      countdownRef.current?.scrollIntoView({
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-        block: 'start'
-      });
-    }, 350);
-  }
-
-  async function toggleAudio(){
-    const audio=audioRef.current;
-    if(!audio)return;
-    if(soundOn){audio.pause();setSoundOn(false)}else await playAudio();
-  }
-
-  return <>
-    <audio ref={audioRef} loop preload="auto" src={asset('wedding-melody.mp3')}/>
-    {!opened && <Envelope onOpen={openInvitation} isOpening={opening}/>}
-    {opened && <main ref={mainRef} className="invitation-page">
-      <FloatingFlowers/>
-      <section className="hero" id="home">
-        <div className="hero-inner reveal visible">
-          <div className="ganesh-symbol" aria-label="Shree Ganesh">ॐ</div>
-          <p className="ganesh-heading">{invitation.blessing}</p>
-          <p className="hero-message">We cordially invite you to witness the beginning of our forever and celebrate the wedding ceremony of</p>
-          <div className="couple-names">
-            <div>{invitation.groom}</div>
-            <p className="couple-parent">(s/o {invitation.groomParents})</p>
-            <span>with</span>
-            <div>{invitation.bride}</div>
-            <p className="couple-parent">(d/o {invitation.brideParents})</p>
-          </div>
-          <p className="hero-date">{invitation.weddingDateText}</p>
-          <div className="hero-mark">❀</div>
-          <p className="hero-venue"><strong>{invitation.venueName}</strong><small>{invitation.venueAddress}</small></p>
-        </div>
-      </section>
-      <ScratchReveal onReveal={revealCountdown}/>
-      {countdownUnlocked && <div ref={countdownRef} className="countdown-enter"><Countdown/></div>}
-      <section className="events mint-panel" id="events">
-        <Heading>Events Schedule</Heading>
-        <div className="event-grid">{invitation.events.map(ev=><EventCard event={ev} key={ev.title}/>)}</div>
-      </section>
-      <section className="presence cream-panel">
-        <Heading>Awaiting Your Noble Presence</Heading>
-        <p>Because meeting you adds joy to our celebration — and you make it complete!</p>
-      </section>
-      <section className="families mint-panel">
-        <Heading eyebrow="WITH LOVE">The Families</Heading>
-        <div className="family-card">
-          <p className="family-card-label">AWAITING YOUR GRACIOUS PRESENCE</p>
-          <p>{invitation.groomParents}</p>
-          <p>{invitation.brideParents}</p>
-          <span>CORDIALLY INVITED BY</span>
-          <p className="invited-by">{invitation.invitedBy}</p>
-          <span>{invitation.rsvpLabel}</span>
-          <div className="rsvp-phones">{invitation.phones.map(phone=><a key={phone} href={`tel:${phone.replace(/[^+\d]/g,'')}`}>{phone}</a>)}</div>
-        </div>
-      </section>
-      <section className="venue cream-panel" id="venue">
-        <Heading eyebrow="VENUE">Where We Celebrate</Heading>
-        <p><strong>{invitation.venueName}</strong><br/>{invitation.venueAddress}</p>
-        <div className="map-frame"><iframe title="The Palace Banquet Hall wedding venue in Kakrali, Punjab" loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={invitation.mapEmbedUrl}/></div>
-        <a className="gold-button directions" href={invitation.directionsUrl} target="_blank" rel="noopener noreferrer">➤ &nbsp; Get Directions</a>
-      </section>
-      <footer className="footer"><span>WITH LOVE</span><h2>{invitation.groom} &amp; {invitation.bride}</h2><span className="footer-flower">❧</span><p>2nd December 2026</p><small>{invitation.rsvpLabel}</small><p className="footer-phones">{invitation.phones.join(' · ')}</p></footer>
-      <AudioToggle audioRef={audioRef} enabled={soundOn} onToggle={toggleAudio}/>
-    </main>}
-  </>;
+function Events() { return <section className="events-section" id="events"><SectionHeader title="Events Schedule" eyebrow="INVITED WITH LOVE"/><div className="events-stack">{wedding.events.map(e=><EventCard key={e.id} e={e}/>)}</div></section>; }
+const clothing=[['Haldi','Sunshine Shades','Yellow · Saffron · Ivory','haldi-icon.png'],['Mehendi','Fresh Pastels','Mint · Sage · Blush','mehendi-icon.png'],['Carnival','Festive & Playful','Soft colours and joyful prints','carnival-icon.png'],['Cocktail','Evening Elegance','Midnight blue · Plum · Silver','coketail_icon.webp'],['Wedding','Traditional Grandeur','Festive Indian attire','wedding-icon.png']];
+function Wardrobe() {return <section className="wardrobe-section"><SectionHeader title="Wardrobe Guide" eyebrow="✧"/><div className="wardrobe-grid">{clothing.map(([event,name,description,img])=><div className="wardrobe-card reveal" key={event}><img src={A(img)} alt="" loading="lazy"/><div><strong>{event}</strong><span>{name}</span><small>{description}</small></div></div>)}</div></section>;}
+function Presence() {return <section className="presence-section" id="presence"><h2 className="presence-title">Awaiting Your Noble Presence</h2><div className="presence-flourish">❀</div><p className="presence-intro">Join us as we celebrate love, laughter, and the beginning of forever beautiful together.</p><div className="presence-love">WITH LOVE</div><strong className="presence-family">Garg Family</strong><div className="presence-invited">LOVINGLY INVITED BY</div><strong className="presence-names">{wedding.invitedBy}</strong><p className="presence-blessing">Eagerly awaiting the pleasure of your presence and blessings.</p><p className="rsvp-label">RSVP · Garg Family</p><div className="phone-links">{wedding.phones.map(p=><a key={p} href={`tel:${p.replace(/[^+\d]/g,'')}`}>{p}</a>)}</div></section>;}
+function Venue() {const url=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(wedding.mapQuery)}`;return <section className="venue-section"><SectionHeader title="The Best Route" eyebrow="WHERE WE CELEBRATE"/><p className="venue-title">{wedding.venue}</p><p>{wedding.address}</p><div className="map-box"><iframe title="Wedding venue map" loading="lazy" src={`https://maps.google.com/maps?q=${encodeURIComponent(wedding.mapQuery)}&z=14&output=embed`} referrerPolicy="no-referrer-when-downgrade"/></div><a className="directions-link" href={url} target="_blank" rel="noopener noreferrer">Get Directions</a></section>;}
+function Music({audioRef}) {const [playing,setPlaying]=useState(false); const toggle=async()=>{let audio=audioRef.current;if(!audio)return;try{if(audio.paused){await audio.play();setPlaying(true)}else{audio.pause();setPlaying(false)}}catch{setPlaying(false)}};return <button type="button" className="music-button" onClick={toggle} aria-label={playing?'Mute music':'Play music'}>{playing?'♫':'♪'}</button>;}
+function useReveals(active) {useEffect(()=>{if(!active)return;const ob=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('shown');ob.unobserve(entry.target)}}),{threshold:.08});document.querySelectorAll('.reveal').forEach(el=>ob.observe(el));return()=>ob.disconnect();},[active]);}
+export default function App() {
+  const [opened,setOpened]=useState(false),audio=useRef(null);useReveals(opened);
+  useEffect(()=>{document.body.classList.toggle('locked',!opened);return()=>document.body.classList.remove('locked');},[opened]);
+  const open = () => {setOpened(true);window.scrollTo(0,0);if(audio.current){audio.current.volume=.22;audio.current.play().catch(()=>{});}};
+  return <><audio ref={audio} src={A('wedding-melody.mp3')} loop preload="none"/><Petals/>{!opened && <Opening onOpen={open}/>}{opened && <><main><RoyalHero/><SaveDate/><Events/><Wardrobe/><Presence/><Venue/></main><footer className="final-footer"><small>WITH LOVE</small><h2>{wedding.groom} &amp; {wedding.bride}</h2><img className="footer-monogram" src={A('footer-monogram.png')} alt="Wedding monogram"/><p>2 DECEMBER 2026</p></footer><Music audioRef={audio}/></>}</>;
 }
