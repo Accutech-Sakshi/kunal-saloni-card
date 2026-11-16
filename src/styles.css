@@ -491,3 +491,35 @@ body {font-family:'Cormorant Garamond',Georgia,serif;color:#53362f;font-weight:5
 @media (prefers-reduced-motion: reduce) {
   .save-date-floral .scratch-fountain-overlay { display: none; }
 }
+/* Wedding invitation description readability */
+
+.wedding-invite-text {
+  max-width: 440px;
+  margin: 22px auto 18px;
+  padding: 0px 18px;
+
+  background: rgba(255, 250, 242, 0.88);
+  border-radius: 12px;
+
+  color: #713b36;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+
+  position: relative;
+  z-index: 2;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .wedding-invite-text {
+    width: 88%;
+    max-width: 340px;
+    margin: 16px auto 20px;
+    padding: 0px 14px;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+}
