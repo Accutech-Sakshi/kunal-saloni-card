@@ -278,7 +278,7 @@ function EventCard({ e }) {
       <span className="event-pretitle">PLEASE JOIN US TO CELEBRATE</span>
       <p className="event-quote">{e.blurb}</p>
       <h3>{e.title}</h3>
-      <div className="event-date">{e.date.toUpperCase()}</div>
+      <div className="event-date">{e.date}</div>
       {isWedding && <><div className="wedding-times"><div><span>♨</span><strong>Pheras</strong><b>{e.pheras}</b></div><div><span>♧</span><strong>Reception</strong><b>{e.reception}</b></div></div><p className="wedding-place">{wedding.venue}<small>{wedding.address}</small></p></>}
     </div>
     {!isWedding && <img className="event-illustration" src={A(e.couple)} alt={`${e.title} illustration`} loading="lazy"/>}

@@ -5,7 +5,7 @@ export const wedding={
   brideParents:'Mrs. Sushila & Mr. Manish Singla',
   dateISO:'2026-12-02T16:00:00+05:30', date:'2 December 2026',
   venue:'The Palace Banquet Hall',address:'Ramgarh Derabassi Road, Kakrali, Punjab',
-  mapQuery:'The Palace Banquet Hall Rangarh Derabassi Road Kakrali Punjab',
+  mapQuery:'The Palace Banquet Hall Ramgarh Derabassi Road Kakrali Punjab',
   invitedBy:'', phones:['+91-9882896000'],
   events:[
    {id:'haldi',title:'Haldi Ceremony',date:'29th November 2026',blurb:'A beautiful beginning filled with blessings',bg:'haldi-bg.jpg',couple:'haldi-couple.png',icon:'favicon.png',tint:'gold'},
