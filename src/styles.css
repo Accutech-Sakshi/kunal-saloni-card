@@ -523,3 +523,79 @@ body {font-family:'Cormorant Garamond',Georgia,serif;color:#53362f;font-weight:5
     line-height: 1.45;
   }
 }
+
+/* Opening invitation - text overlap fix */
+
+.opening-paper {
+  box-sizing: border-box;
+  padding: 20px 18px 30px;
+}
+
+.opening-paper h1 {
+  position: relative;
+  z-index: 3;
+  color: #831c35;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  margin: 22px 0 8px;
+}
+
+.opening-paper > p {
+  position: relative;
+  z-index: 3;
+  width: fit-content;
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 7px 16px;
+  background: rgba(255, 250, 242, 0.94);
+  border-radius: 10px;
+  color: #713b40;
+  font-size: 17px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .opening-envelope {
+    width: min(67vw, 290px);
+    flex-shrink: 0;
+  }
+
+  .opening-ganesh {
+    width: 65px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+
+  .opening-paper h1 {
+    font-size: clamp(25px, 6.8vw, 32px);
+    letter-spacing: 0.07em;
+    margin: 20px 0 10px;
+  }
+
+  .opening-paper > p {
+    font-size: 14px;
+    padding: 8px 14px;
+    max-width: 88%;
+  }
+}
+
+/* Short mobile screens */
+@media (max-width: 600px) and (max-height: 700px) {
+  .opening-envelope {
+    width: min(59vw, 245px);
+  }
+
+  .opening-ganesh {
+    width: 50px;
+    margin-bottom: 8px;
+  }
+
+  .opening-paper h1 {
+    margin-top: 12px;
+    font-size: 25px;
+  }
+}

@@ -279,7 +279,7 @@ function EventCard({ e }) {
       <p className="event-quote">{e.blurb}</p>
       <h3>{e.title}</h3>
       <div className="event-date">{e.date}</div>
-      {isWedding && <><div className="wedding-times"><div><span>♨</span><strong>Pheras</strong><b>{e.pheras}</b></div><div><span>♧</span><strong>Reception</strong><b>{e.reception}</b></div></div><p className="wedding-place">{wedding.venue}<small>{wedding.address}</small></p></>}
+      {isWedding && <><div className="wedding-times"><div><span>🪷</span><strong>Pheras</strong><b>{e.pheras}</b></div><div><span>💐</span><strong>Reception</strong><b>{e.reception}</b></div></div><p className="wedding-place">{wedding.venue}<small>{wedding.address}</small></p></>}
     </div>
     {!isWedding && <img className="event-illustration" src={A(e.couple)} alt={`${e.title} illustration`} loading="lazy"/>}
     {isWedding && <img className="event-illustration wedding-illustration" src={A(e.couple)} alt="Kunal and Saloni wedding illustration" loading="lazy"/>}
@@ -296,5 +296,5 @@ export default function App() {
   const [opened,setOpened]=useState(false),audio=useRef(null);useReveals(opened);
   useEffect(()=>{document.body.classList.toggle('locked',!opened);return()=>document.body.classList.remove('locked');},[opened]);
   const open = () => {setOpened(true);window.scrollTo(0,0);if(audio.current){audio.current.volume=.22;audio.current.play().catch(()=>{});}};
-  return <><audio ref={audio} src={A('wedding-melody.mp3')} loop preload="none"/><Petals/>{!opened && <Opening onOpen={open}/>}{opened && <><main><RoyalHero/><SaveDate/><Events/><Wardrobe/><Presence/><Venue/></main><footer className="final-footer"><small>WITH LOVE</small><h2>{wedding.groom} &amp; {wedding.bride}</h2><img className="footer-monogram" src={A('favicon.png')} alt="Wedding monogram"/><p>2nd DECEMBER 2026</p></footer><Music audioRef={audio}/></>}</>;
+  return <><audio ref={audio} src={A('wedding-melody.mp3')} loop preload="none"/><Petals/>{!opened && <Opening onOpen={open}/>}{opened && <><main><RoyalHero/><SaveDate/><Events/><Wardrobe/><Presence/><Venue/></main><footer className="final-footer"><h2>{wedding.groom} &amp; {wedding.bride}</h2><img className="footer-monogram" src={A('favicon.png')} alt="Wedding monogram"/><p>2nd DECEMBER 2026</p></footer><Music audioRef={audio}/></>}</>;
 }
