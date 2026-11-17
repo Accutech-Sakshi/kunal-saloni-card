@@ -599,3 +599,47 @@ body {font-family:'Cormorant Garamond',Georgia,serif;color:#53362f;font-weight:5
     font-size: 25px;
   }
 }
+
+/* Pheras & Reception Gold Icons */
+
+.wedding-times > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.wedding-time-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.wedding-times strong {
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.wedding-times b {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .wedding-time-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .wedding-times strong {
+    font-size: 16px;
+  }
+
+  .wedding-times b {
+    font-size: 15px;
+  }
+}

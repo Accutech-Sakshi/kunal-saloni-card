@@ -279,7 +279,37 @@ function EventCard({ e }) {
       <p className="event-quote">{e.blurb}</p>
       <h3>{e.title}</h3>
       <div className="event-date">{e.date}</div>
-      {isWedding && <><div className="wedding-times"><div><span>🪷</span><strong>Pheras</strong><b>{e.pheras}</b></div><div><span>💐</span><strong>Reception</strong><b>{e.reception}</b></div></div><p className="wedding-place">{wedding.venue}<small>{wedding.address}</small></p></>}
+
+{isWedding && (
+  <>
+    <div className="wedding-times">
+      <div>
+        <img
+          src="/assets/pheras.webp"
+          alt="Pheras"
+          className="wedding-time-icon"
+        />
+        <strong>Pheras</strong>
+        <b>{e.pheras}</b>
+      </div>
+
+      <div>
+        <img
+          src="/assets/reception.webp"
+          alt="Reception"
+          className="wedding-time-icon"
+        />
+        <strong>Reception</strong>
+        <b>{e.reception}</b>
+      </div>
+    </div>
+
+    <p className="wedding-place">
+      {wedding.venue}
+      <small>{wedding.address}</small>
+    </p>
+  </>
+)}
     </div>
     {!isWedding && <img className="event-illustration" src={A(e.couple)} alt={`${e.title} illustration`} loading="lazy"/>}
     {isWedding && <img className="event-illustration wedding-illustration" src={A(e.couple)} alt="Kunal and Saloni wedding illustration" loading="lazy"/>}
