@@ -643,3 +643,62 @@ body {font-family:'Cormorant Garamond',Georgia,serif;color:#53362f;font-weight:5
     font-size: 15px;
   }
 }
+
+/* Companies below RSVP */
+
+.presence-companies {
+  width: 100%;
+  max-width: 600px;
+  margin: 25px auto 0;
+  text-align: center;
+}
+
+.companies-divider {
+  color: #c29555;
+  font-size: 19px;
+  margin-bottom: 16px;
+}
+
+.companies-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 25px;
+  align-items: center;
+}
+
+.companies-list span {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 21px;
+  font-weight: 600;
+  color: #87233b;
+  line-height: 1.3;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .presence-companies {
+    max-width: 94%;
+    margin-top: 22px;
+  }
+
+  .companies-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 10px;
+  }
+
+  .companies-list span {
+    font-size: 17px;
+  }
+
+  .presence-section {
+    height: auto;
+    min-height: 0;
+    padding-bottom: 65px;
+  }
+}
+
+@media (max-width: 360px) {
+  .companies-list span {
+    font-size: 15px;
+  }
+}

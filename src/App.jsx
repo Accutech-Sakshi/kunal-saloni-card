@@ -318,7 +318,71 @@ function EventCard({ e }) {
 function Events() { return <section className="events-section" id="events"><SectionHeader title="Events Schedule" eyebrow="INVITED WITH LOVE"/><div className="events-stack">{wedding.events.map(e=><EventCard key={e.id} e={e}/>)}</div></section>; }
 const clothing=[['Haldi','Sunshine & Traditions','Bright, cheerful and effortlessly festive vibes','haldi-icon.png'],['Mehendi','Garden Romance','Fresh, floral and beautifully graceful looks','mehendi-icon.png'],['Carnival','Festive & Playful','Bold styles, statement outfits and joyful prints','carnival-icon.png'],['Cocktail','Glamour After Dark','Chic, sophisticated and effortlessly glamorous','coketail_icon.webp'],['Wedding','Timeless Grandeur','Traditional Indian elegance with a festive touch','wedding-icon.png']];
 function Wardrobe() {return <section className="wardrobe-section"><SectionHeader title="Wardrobe Guide" eyebrow="✧"/><div className="wardrobe-grid">{clothing.map(([event,name,description,img])=><div className="wardrobe-card reveal" key={event}><img src={A(img)} alt="" loading="lazy"/><div><strong>{event}</strong><span>{name}</span><small>{description}</small></div></div>)}</div></section>;}
-function Presence() {return <section className="presence-section" id="presence"><h2 className="presence-title">Awaiting Your Noble Presence</h2><div className="presence-flourish">❀</div><p className="presence-intro">Join us as we celebrate love, laughter, and the beginning of forever beautiful together.</p><div className="presence-love">WITH LOVE</div><strong className="presence-family">Garg Family</strong><strong className="presence-names">{wedding.invitedBy}</strong><p className="presence-blessing">Eagerly awaiting the pleasure of your presence and blessings.</p><p className="rsvp-label">RSVP · Garg Family</p><div className="phone-links">{wedding.phones.map(p=><a key={p} href={`tel:${p.replace(/[^+\d]/g,'')}`}>{p}</a>)}</div></section>;}
+
+function Presence() {
+  const companies = [
+    "BDR Ingesta",
+    "Consumer Mart",
+    "MBS Lifescience Pvt Ltd",
+    "MBS Formulation",
+    "MBS Pharma",
+    "Mgee Healthcare",
+  ];
+
+  return (
+    <section className="presence-section" id="presence">
+      <h2 className="presence-title">
+        Awaiting Your Noble Presence
+      </h2>
+
+      <div className="presence-flourish">❀</div>
+
+      <p className="presence-intro">
+        Join us as we celebrate love, laughter, and the
+        beginning of forever beautiful together.
+      </p>
+
+      <div className="presence-love">WITH LOVE</div>
+
+      <strong className="presence-family">
+        Garg Family
+      </strong>
+
+      <strong className="presence-names">
+        {wedding.invitedBy}
+      </strong>
+
+      <p className="presence-blessing">
+        Eagerly awaiting the pleasure of your presence
+        and blessings.
+      </p>
+
+      <p className="rsvp-label">RSVP · Garg Family</p>
+
+      <div className="phone-links">
+        {wedding.phones.map((p) => (
+          <a
+            key={p}
+            href={`tel:${p.replace(/[^+\d]/g, "")}`}
+          >
+            {p}
+          </a>
+        ))}
+      </div>
+
+      {/* Companies */}
+      <div className="presence-companies">
+        <div className="companies-divider">❀</div>
+
+        <div className="companies-list">
+          {companies.map((company) => (
+            <span key={company}>{company}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 function Venue() {const url=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(wedding.mapQuery)}`;return <section className="venue-section"><SectionHeader title="The Best Route" eyebrow="WHERE WE CELEBRATE"/><p className="venue-title">{wedding.venue}</p><p>{wedding.address}</p><div className="map-box"><iframe title="Wedding venue map" loading="lazy" src={`https://maps.google.com/maps?q=${encodeURIComponent(wedding.mapQuery)}&z=14&output=embed`} referrerPolicy="no-referrer-when-downgrade"/></div><a className="directions-link" href={url} target="_blank" rel="noopener noreferrer">Get Directions</a></section>;}
 function Music({audioRef}) {const [playing,setPlaying]=useState(false); const toggle=async()=>{let audio=audioRef.current;if(!audio)return;try{if(audio.paused){await audio.play();setPlaying(true)}else{audio.pause();setPlaying(false)}}catch{setPlaying(false)}};return <button type="button" className="music-button" onClick={toggle} aria-label={playing?'Mute music':'Play music'}>{playing?'♫':'♪'}</button>;}
 function useReveals(active) {useEffect(()=>{if(!active)return;const ob=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('shown');ob.unobserve(entry.target)}}),{threshold:.08});document.querySelectorAll('.reveal').forEach(el=>ob.observe(el));return()=>ob.disconnect();},[active]);}
