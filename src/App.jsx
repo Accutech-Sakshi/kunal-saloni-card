@@ -370,16 +370,7 @@ function Presence() {
         ))}
       </div>
 
-      {/* Companies */}
-      <div className="presence-companies">
-        <div className="companies-divider">❀</div>
 
-        <div className="companies-list">
-          {companies.map((company) => (
-            <span key={company}>{company}</span>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
