@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { wedding } from './data.js';
 
+
 const A = name => `/assets/${name}`;
 const flowerData = Array.from({ length: 9 }, (_, i) => ({
   left: `${(i * 41.37 + 9) % 100}%`,
